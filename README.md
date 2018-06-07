@@ -16,4 +16,4 @@ In addition to providing feedback on this project site, we'd love to hear direct
 ## Additional Information
 This solution uses CrmOrganizationServiceContext for LINQ capability, which uses SOAP and displays corresponding QueryExpression and FetchXML. 
 
-As this endpoint is deprecated with latest version of Dynamics 365, please use the Web API version instead. (CRMLinqPadDriverWebAPI)[https://github.com/kenakamu/CRMLinqPadDriverWebAPI]
+As this endpoint is deprecated with latest version of Dynamics 365, please use the Web API version instead. [CRMLinqPadDriverWebAPI](https://github.com/kenakamu/CRMLinqPadDriverWebAPI)
