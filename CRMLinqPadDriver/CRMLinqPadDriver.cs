@@ -131,16 +131,19 @@ namespace Microsoft.Pfe.Xrm
             switch (props.AuthenticationProviderType)
             {
                 case AuthenticationProviderType.OnlineFederation:
-                    crmConn = new CrmServiceClient(String.Format("AuthType=Office365; Username={1}; Password={2}; Url={0}", props.OrgUri, props.UserName, props.Password));
+                    crmConn = new CrmServiceClient(
+                        $"AuthType=Office365; Username={props.UserName}; Password={props.Password}; Url={props.OrgUri}");
                     break;
                 case AuthenticationProviderType.ActiveDirectory:
                     if (String.IsNullOrEmpty(props.DomainName))
-                        crmConn = new CrmServiceClient(String.Format("Url={0};", props.OrgUri));
+                        crmConn = new CrmServiceClient($"Url={props.OrgUri};");
                     else
-                        crmConn = new CrmServiceClient(String.Format("Url={0}; Domain={1}; Username={2}; Password={3};", props.OrgUri, props.DomainName, props.UserName, props.Password));
+                        crmConn = new CrmServiceClient(
+                            $"Url={props.OrgUri}; Domain={props.DomainName}; Username={props.UserName}; Password={props.Password};");
                     break;
                 case AuthenticationProviderType.Federation:
-                    crmConn = new CrmServiceClient(String.Format("AuthType=IFD; Url={0}{4}; Domain={3}; Username={1}; Password={2};", props.OrgUri, props.UserName, props.Password, props.DomainName, props.ConnectedOrgUniqueName));
+                    crmConn = new CrmServiceClient(
+                        $"AuthType=IFD; Url={props.OrgUri}{props.ConnectedOrgUniqueName}; Domain={props.DomainName}; Username={props.UserName}; Password={props.Password};");
                     break;
             }
             if (crmConn != null && crmConn.IsReady)
@@ -203,7 +206,8 @@ namespace Microsoft.Pfe.Xrm
                 "Microsoft.Crm.Sdk.Messages",
                 "Microsoft.Xrm.Sdk.Discovery",
                 "Microsoft.Xrm.Tooling.Connector",
-                "Microsoft.Pfe.Xrm"
+                "Microsoft.Pfe.Xrm",
+                "DG.XrmContext"
             };
         }
 

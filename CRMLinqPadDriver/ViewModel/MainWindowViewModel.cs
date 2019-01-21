@@ -16,7 +16,6 @@
 using LINQPad.Extensibility.DataContext;
 using Microsoft.Pfe.Xrm.Common;
 using Microsoft.Pfe.Xrm.View;
-using Microsoft.CSharp;
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
@@ -28,6 +27,7 @@ using System.Runtime.InteropServices;
 using System.ServiceModel.Description;
 using System.Threading.Tasks;
 using System.Windows;
+using Microsoft.CodeDom.Providers.DotNetCompilerPlatform;
 using Microsoft.Xrm.Sdk.Client;
 using Microsoft.Xrm.Sdk.Discovery;
 using Microsoft.Xrm.Tooling.Connector;
@@ -126,7 +126,7 @@ namespace Microsoft.Pfe.Xrm.ViewModel
         private void LoadData()
         {
             // Generate code by using CrmSvcUtil.exe
-            var code = GenerateCode(props);
+            GenerateCode(props);
 
             // Store assembly full path.
             string assemblyFullName = "";
@@ -140,7 +140,7 @@ namespace Microsoft.Pfe.Xrm.ViewModel
             props._cxInfo.CustomTypeInfo.CustomAssemblyPath = assemblyFullName;
 
             // Compile the code into the assembly. To avoid duplicate name for each connection, hash entire URL to make it unique.
-            BuildAssembly(code, assemblyFullName);
+            BuildAssembly(assemblyFullName);
 
             // Then delete generated files.
             Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.cs").ToList().ForEach(File.Delete);
@@ -158,51 +158,20 @@ namespace Microsoft.Pfe.Xrm.ViewModel
         /// </summary>
         /// <param name="props">CRM Properties</param>
         /// <returns>Generate code</returns>
-        private string[] GenerateCode(CrmProperties props)
+        private void GenerateCode(CrmProperties props)
         {
-            return new []
-            {
-                ExecuteCrmSvcUtil(props, CodeGenerationType.OptionSet),
-                ExecuteCrmSvcUtil(props, CodeGenerationType.Entity)
-            };
+            ExecuteCrmSvcUtil(props);
         }
 
-        private string ExecuteCrmSvcUtil(CrmProperties props, CodeGenerationType generationType)
+        private void ExecuteCrmSvcUtil(CrmProperties props)
         {
-            var svcUtilCodeCustomizationParams = "";
             var generatedNameSpace = "Microsoft.Pfe.Xrm";
-            var authProviderType = "";
-            switch (props.AuthenticationProviderType)
-            {
-                case AuthenticationProviderType.OnlineFederation:
-                    authProviderType = "Office365";
-                    break;
-                case AuthenticationProviderType.ActiveDirectory:
-                    authProviderType = "AD";
-                    break;
-                case AuthenticationProviderType.Federation:
-                    authProviderType = "IFD";
-                    break;
-            }
-            if (generationType == CodeGenerationType.Entity)
-            {
-                LoadMessage = "Generating Entity classes..";
-                svcUtilCodeCustomizationParams =
-                    "/codeCustomization:\"DLaB.CrmSvcUtilExtensions.Entity.CustomizeCodeDomService,DLaB.CrmSvcUtilExtensions\" /codegenerationservice:\"DLaB.CrmSvcUtilExtensions.Entity.CustomCodeGenerationService,DLaB.CrmSvcUtilExtensions\" /codewriterfilter:\"DLaB.CrmSvcUtilExtensions.Entity.CodeWriterFilterService,DLaB.CrmSvcUtilExtensions\" /namingservice:\"DLaB.CrmSvcUtilExtensions.NamingService,DLaB.CrmSvcUtilExtensions\" /metadataproviderservice:\"DLaB.CrmSvcUtilExtensions.Entity.MetadataProviderService,DLaB.CrmSvcUtilExtensions\"";
-                generatedNameSpace = "Microsoft.Pfe.Xrm.Entities";
-            }
-            else
-            {
-                LoadMessage = "Generating Optionset enums..";
-                svcUtilCodeCustomizationParams =
-                    "/codeCustomization:\"DLaB.CrmSvcUtilExtensions.OptionSet.CreateOptionSetEnums,DLaB.CrmSvcUtilExtensions\" /codegenerationservice:\"DLaB.CrmSvcUtilExtensions.OptionSet.CustomCodeGenerationService,DLaB.CrmSvcUtilExtensions\" /codewriterfilter:\"DLaB.CrmSvcUtilExtensions.OptionSet.CodeWriterFilterService,DLaB.CrmSvcUtilExtensions\" /namingservice:\"DLaB.CrmSvcUtilExtensions.NamingService,DLaB.CrmSvcUtilExtensions\" /metadataproviderservice:\"DLaB.CrmSvcUtilExtensions.BaseMetadataProviderService,DLaB.CrmSvcUtilExtensions\"";
-            }
             // Create Process
             Process p = new Process();
 
             p.StartInfo.UseShellExecute = false;
             // Specify CrmSvcUtil.exe as process name.
-            p.StartInfo.FileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CrmSvcUtil.exe");
+            p.StartInfo.FileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "XrmContext", "XrmContext.exe");
             // Do not display window
             p.StartInfo.CreateNoWindow = true;
             p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
@@ -210,34 +179,17 @@ namespace Microsoft.Pfe.Xrm.ViewModel
             if (props.UserName != string.Empty)
             {
                 p.StartInfo.Arguments =
-                    String.Format(
-                        "{4} /connectionstring:\"AuthType={5}; Url={0}{7}; UserName={1}; Password={2}; Domain={8}\"; /out:\"{3}\" /namespace:{6} /serviceContextName:XrmContext",
-                        props.OrgUri,
-                        props.UserName,
-                        props.Password,
-                        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, generationType+".cs"),
-                        svcUtilCodeCustomizationParams,
-                        authProviderType,
-                        generatedNameSpace,
-                        props.ConnectedOrgUniqueName,
-                        props.DomainName);
+                    $"/ap:{props.AuthenticationProviderType} /url:{props.OrgUri}/XrmServices/2011/Organization.svc /username:{props.UserName} /password:{props.Password} /domain:{props.DomainName} /out:\"{AppDomain.CurrentDomain.BaseDirectory}\" /namespace:{generatedNameSpace} /servicecontextname:XrmContext";
             }
             else
             {
                 p.StartInfo.Arguments =
-                    String.Format(
-                        "{2} /connectionstring:\"Url={0}; AuthType=AD;\" /out:\"{1}\" /namespace:{3} /serviceContextName:XrmContext",
-                        props.OrgUriActual,
-                        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, generationType + ".cs"),
-                        svcUtilCodeCustomizationParams,
-                        generatedNameSpace);
+                    $"/url:{props.OrgUriActual} /authtype:ActiveDirectory /out:\"{AppDomain.CurrentDomain.BaseDirectory}\" /namespace:{generatedNameSpace} /servicecontextname:XrmContext";
             }
 
             // Execute and wait until it complited.
             p.Start();
             p.WaitForExit();
-            // Read generate file and return it.
-            return System.IO.File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, generationType + ".cs"));
         }
 
         /// <summary>
@@ -245,21 +197,24 @@ namespace Microsoft.Pfe.Xrm.ViewModel
         /// </summary>
         /// <param name="code">code to be compiled</param>
         /// <param name="name">assembly name</param>
-        private void BuildAssembly(string[] code, string name)
+        private void BuildAssembly(string name)
         {
             // Use the CSharpCodeProvider to compile the generated code:
             CompilerResults results;
-            using (var codeProvider = new CSharpCodeProvider(new Dictionary<string, string>() { { "CompilerVersion", "v4.0" } }))
+            using (var codeProvider = new CSharpCodeProvider())
             {
                 var options = new CompilerParameters(
-                    "System.dll System.Core.dll System.Xml.dll System.Data.Services.Client.dll System.Runtime.Serialization.dll System.Data.Services.dll".Split(' '),
+                    "System.dll System.ServiceModel.dll System.Core.dll System.Xml.dll System.Data.Services.Client.dll System.Runtime.Serialization.dll System.Data.Services.dll".Split(' '),
                     name,
                     false);
                 // Force load Microsoft.Xrm.Sdk assembly.
                 options.ReferencedAssemblies.Add(typeof(Microsoft.Xrm.Sdk.Entity).Assembly.Location);
+                options.ReferencedAssemblies.Add(typeof(Microsoft.Crm.Sdk.Messages.AddAppComponentsRequest).Assembly.Location);
                 LoadMessage = "Building LINQPad context assembly..";
                 // Compile
-                results = codeProvider.CompileAssemblyFromSource(options, code);
+                results = codeProvider.CompileAssemblyFromFile(options, 
+                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "XrmExtensions.cs"),
+                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "XrmContext.cs"));
                 Message = "";
             }
             if (results.Errors.Count > 0)
@@ -374,7 +329,7 @@ namespace Microsoft.Pfe.Xrm.ViewModel
                     await Task.Run(() => LoadData());
 
                     // Set Context class name.
-                    props._cxInfo.CustomTypeInfo.CustomTypeName = "Microsoft.Pfe.Xrm.Entities.XrmContext";
+                    props._cxInfo.CustomTypeInfo.CustomTypeName = "Microsoft.Pfe.Xrm.XrmContext";
                 }
 
                 IsLoading = false;
