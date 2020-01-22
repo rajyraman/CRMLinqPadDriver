@@ -141,7 +141,7 @@ namespace Microsoft.Pfe.Xrm.ViewModel
             Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.cs").ToList().ForEach(File.Delete);
             // Update message.
             LoadMessage = "";
-            Message = "Loading Complete. Click Exit and wait a while until Linq Pad displays full Schema information.";
+            Message = "Loading Complete. Click Exit and wait a while until LINQPad displays full Schema information.";
             IsLoaded = true;
         }
 
@@ -299,7 +299,6 @@ namespace Microsoft.Pfe.Xrm.ViewModel
                     props.FriendlyName = ctrl.CrmConnectionMgr.CrmSvc.ConnectedOrgFriendlyName;
                     props.AuthenticationProviderType =
                         ctrl.CrmConnectionMgr.CrmSvc.OrganizationServiceProxy.ServiceConfiguration.AuthenticationType;
-
                     ClientCredentials credentials = ctrl.CrmConnectionMgr.CrmSvc.OrganizationServiceProxy.ClientCredentials;
                     if (credentials.UserName.UserName != null)
                     {
