@@ -14,23 +14,18 @@
  =================================================================================================================================*/
 
 using LINQPad.Extensibility.DataContext;
+using Microsoft.CodeDom.Providers.DotNetCompilerPlatform;
 using Microsoft.Pfe.Xrm.Common;
 using Microsoft.Pfe.Xrm.View;
+using Microsoft.Xrm.Sdk.Discovery;
 using System;
 using System.CodeDom.Compiler;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using System.ServiceModel.Description;
 using System.Threading.Tasks;
 using System.Windows;
-using Microsoft.CodeDom.Providers.DotNetCompilerPlatform;
-using Microsoft.Xrm.Sdk.Client;
-using Microsoft.Xrm.Sdk.Discovery;
-using Microsoft.Xrm.Tooling.Connector;
 
 namespace Microsoft.Pfe.Xrm.ViewModel
 {
@@ -173,8 +168,8 @@ namespace Microsoft.Pfe.Xrm.ViewModel
             // Specify CrmSvcUtil.exe as process name.
             p.StartInfo.FileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "XrmContext", "XrmContext.exe");
             // Do not display window
-            p.StartInfo.CreateNoWindow = true;
-            p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            p.StartInfo.CreateNoWindow = false;
+            p.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
             // Assign argumemnt for CrmSvcUtil. This format works for all environment.
             if (props.UserName != string.Empty)
             {
@@ -212,7 +207,7 @@ namespace Microsoft.Pfe.Xrm.ViewModel
                 options.ReferencedAssemblies.Add(typeof(Microsoft.Crm.Sdk.Messages.AddAppComponentsRequest).Assembly.Location);
                 LoadMessage = "Building LINQPad context assembly..";
                 // Compile
-                results = codeProvider.CompileAssemblyFromFile(options, 
+                results = codeProvider.CompileAssemblyFromFile(options,
                     Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "XrmExtensions.cs"),
                     Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "XrmContext.cs"));
                 Message = "";

@@ -34,11 +34,11 @@
         </Grid.RowDefinitions>
         <Grid Background="{StaticResource MAIN_COLOR}" >
             <StackPanel VerticalAlignment="Center" Margin="20,0">
-                <TextBlock Text="Linq Pad Driver for Dynamics CRM" Foreground="White" FontSize="24" />
+                <TextBlock Text="Dynamics 365/Power Apps LINQPad Driver" Foreground="White" FontSize="24" />
             </StackPanel>
         </Grid>
         <Grid Grid.Row="1" Margin="20,10,20,0" IsEnabled="{Binding !IsLoaded}" Visibility="{Binding IsNewConnection, Converter={StaticResource BoolToVisibilityConverter}}">
-            <Button Content="Login to CRM" HorizontalAlignment="Left" Width="150" Command="{Binding LoginCommand}"/>
+            <Button Content="Login to CDS" HorizontalAlignment="Left" Width="150" Command="{Binding LoginCommand}"/>
         </Grid>
         <Grid Grid.Row="1" Margin="20,10,20,0" Visibility="{Binding IsNewConnection, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=true}">
             <Button Content="Change Credential" HorizontalAlignment="Left" Width="150" Command="{Binding ChangeCredentialCommand}"/>

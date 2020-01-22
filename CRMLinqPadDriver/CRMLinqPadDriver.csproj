@@ -207,12 +207,20 @@
     <Content Include="XrmContext\Microsoft.Crm.Sdk.Proxy.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="XrmContext\Microsoft.IdentityModel.Clients.ActiveDirectory.dll" />
+    <Content Include="XrmContext\Microsoft.IdentityModel.Clients.ActiveDirectory.WindowsForms.dll" />
+    <Content Include="XrmContext\Microsoft.Rest.ClientRuntime.dll" />
+    <Content Include="XrmContext\Microsoft.Xrm.Sdk.Deployment.dll" />
     <Content Include="XrmContext\Microsoft.Xrm.Sdk.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="XrmContext\Microsoft.Xrm.Sdk.Workflow.dll" />
+    <Content Include="XrmContext\Microsoft.Xrm.Tooling.Connector.dll" />
+    <Content Include="XrmContext\Newtonsoft.Json.dll" />
     <Content Include="XrmContext\XrmContext.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="XrmContext\XrmContext.pdb" />
     <Content Include="XrmContext\XrmContext.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

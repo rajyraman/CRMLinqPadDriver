@@ -17,6 +17,7 @@ using LINQPad.Extensibility.DataContext;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Pfe.Xrm.Helper;
 using Microsoft.Pfe.Xrm.View;
+using Microsoft.Xrm.Sdk.Client;
 using Microsoft.Xrm.Sdk.Query;
 using Microsoft.Xrm.Tooling.Connector;
 using System;
@@ -28,7 +29,6 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
-using Microsoft.Xrm.Sdk.Client;
 
 namespace Microsoft.Pfe.Xrm
 {
@@ -55,7 +55,7 @@ namespace Microsoft.Pfe.Xrm
         // Display Name for Driver.
         public override string Name
         {
-            get { return "Dynamics CRM Linq Pad Driver"; }
+            get { return "Dynamics 365/Power Apps LINQPad Driver"; }
         }
 
         /// <summary>
